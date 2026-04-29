@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Bug Reports collection
+    match /bugReports/{reportId} {
+      allow create: if isValidBugReport(incoming());
+      // Only the Firebase Console (Admin) should read these for now
+      allow read, update, delete: if false;
+    }
+
+    function isValidBugReport(data) {
+      return data.keys().hasAll(['message', 'createdAt', 'userAgent']) 
+        && data.keys().size() == 3
+        && data.message is string 
+        && data.message.size() > 0 
+        && data.message.size() <= 2000
+        && data.createdAt is timestamp
+        // && data.createdAt == request.time // Best practice to use server time
+        && data.userAgent is string;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "entities": {
+    "BugReport": {
+      "title": "Bug Report",
+      "description": "A report submitted by a user about an issue or feedback.",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "The detailed description of the bug or feedback."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the report was created."
+        },
+        "userAgent": {
+          "type": "string",
+          "description": "User agent string of the reporter's browser."
+        }
+      },
+      "required": ["message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "bugReports/{reportId}": {
+      "schema": "BugReport",
+      "description": "Collection of community-submitted bug reports and feedback."
+    }
+  }
+}
